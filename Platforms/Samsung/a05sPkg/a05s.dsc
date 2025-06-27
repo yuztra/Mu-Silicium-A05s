@@ -30,7 +30,7 @@
   # 0 = SM6225
   # 1 = SM6225-AD
   #
-  SOC_TYPE                       = 1
+  SOC_TYPE                       = 0
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -DSOC_TYPE=$(SOC_TYPE) -DHAS_BUILD_IN_KEYBOARD=$(HAS_BUILD_IN_KEYBOARD)
