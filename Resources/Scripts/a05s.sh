@@ -1,9 +1,7 @@
 #!/bin/bash
 
 # Build an Android kernel that is actually UEFI disguised as the Kernel
-cat ./BootShim/AARCH64/BootShim.bin "./Build/a05sPkg/${_TARGET_BUILD_MODE}_CLANGPDB/FV/A05S_UEFI.fd" > "./Build/a05sPkg/${_TARGET_BUILD_MODE}_CLANGPDB/FV/A05S_UEFI.fd-bootshim"||exit 1
-gzip -c < "./Build/a05sPkg/${_TARGET_BUILD_MODE}_CLANGPDB/FV/A05S_UEFI.fd-bootshim" > "./Build/a05sPkg/${_TARGET_BUILD_MODE}_CLANGPDB/FV/A05S_UEFI.fd-bootshim.gz"||exit 1
-cat "./Build/a05sPkg/${_TARGET_BUILD_MODE}_CLANGPDB/FV/A05S_UEFI.fd-bootshim.gz" ./Resources/DTBs/a05s.dtb > ./Resources/bootpayload.bin||exit 1
+cat ./BootShim/AARCH64/BootShim.bin "./Build/a05sPkg/${_TARGET_BUILD_MODE}_CLANGPDB/FV/A05S_UEFI.fd" > ./Resources/bootpayload.bin||exit 1
 
 # Create bootable Android boot.img
 python3 ./Resources/Scripts/mkbootimg.py \
@@ -14,6 +12,10 @@ python3 ./Resources/Scripts/mkbootimg.py \
   --tags_offset 0x00008000 \
   --os_version 13.0.0 \
   --os_patch_level "$(date '+%Y-%m')" \
-  --header_version 1 \
-  -o Mu-a05s.img \
+  --header_version 4 \
+  -o boot.img \
   ||_error "\nFailed to create Android Boot Image!\n"
+
+# Compress Boot Image in a tar File for Odin/heimdall Flash
+tar -c boot.img -f Mu-a05s.tar||exit 1
+mv boot.img Mu-a05s.img||exit 1
